@@ -4,6 +4,7 @@ import formData from 'express-form-data'
 import routes from './routes/films'
 
 const app = express()
+import './database'
 
 app.set('PORT', process.env.PORT || 3000)
 
