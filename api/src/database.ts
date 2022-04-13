@@ -1,8 +1,6 @@
 import mongoose from 'mongoose'
 import { mongodb } from './keys'
 
-console.log('uri:', mongodb.URI)
-
 mongoose.connect(mongodb.URI)
     .then(db => {
         console.log('DB is connected')
