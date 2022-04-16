@@ -3,7 +3,11 @@
 ### Database
 The database management system used for this project is MongoDB.
 
-## Instructions
+### Run the project
+### Prerequisites
+    - [Install Node.js](https://nodejs.org/es/download/). Install version greater than or equal to 12.
+
+### Instructions
 1) Install the required dependencies running: ```npm i```
 2) Create a .env file and save it in this directory.
 

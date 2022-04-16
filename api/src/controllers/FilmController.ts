@@ -21,9 +21,9 @@ class FilmController {
 
     public uploadFilms(req: any, res: Response) {
         if (req.files && req.files.uploadFilms) {
-            readCSV(req.files.uploadFilms.path, async (err: any, data: IFilm[]) => {
+            readCSV(req.files.uploadFilms.path, async (err?: any, data?: any[]) => {
                 if (!err) {
-                    if (data.length > 0) {
+                    if (data && data.length > 0) {
                         Film.collection.insertMany(data, {ordered: false}, (err, docs) => {
                             if (!err) {
                                 console.log('docs', docs)
