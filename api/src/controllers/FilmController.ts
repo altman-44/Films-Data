@@ -14,8 +14,9 @@ const UNABLE_TO_DELETE_ALL_FILMS = "Couldn't delete the film data"
 class FilmController {
     
     public async index (req: Request, res: Response) {
+        const films: IFilm[] = await Film.find()
         res.json({
-            films: await Film.find()
+            films
         })
     }
 
@@ -30,26 +31,18 @@ class FilmController {
                                 res.status(200)
                                 res.send(FILMS_UPLOADED_SUCCESSFULLY)
                             } else {
-                                res.status(400)
-                                res.send(UNABLE_TO_UPLOAD_FILMS)
+                                res.status(400).send(UNABLE_TO_UPLOAD_FILMS)
                             }
                         })
                     } else {
-                        res.status(400)
-                        res.send(EMPTY_FILE)
+                        res.status(400).send(EMPTY_FILE)
                     }
                 } else {
-                    res.status(400)
-                    if (err instanceof AssertionError) {
-                        res.send(err.message)
-                    } else {
-                        res.send(UNABLE_TO_READ_FILE)
-                    }
+                    res.status(400).send(err.message || UNABLE_TO_READ_FILE)
                 }
             }, Object.keys(Film.schema.obj))
         } else {
-            res.status(400)
-            res.send(FILE_NOT_UPLOADED)
+            res.status(400).send(FILE_NOT_UPLOADED)
         }
     }
 

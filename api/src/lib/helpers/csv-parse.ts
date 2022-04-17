@@ -23,7 +23,8 @@ function readCSV(path: string, cb: cbReadCSV, columnNames?: string[]) {
     const parser = parse({columns: true, delimiter: ';'}, (err?: CsvError | any, records?: any[]) => {
         console.log('records', records)
         if (err) {
-            err.message = parseErrMessage(err)
+            console.log('err.message: ', err.message)
+            // err.message = parseErrMessage(err)
         } else if (records && records.length > 0) {
             if (columnNames) err = verifyColumnNames(records[0], columnNames)
         }

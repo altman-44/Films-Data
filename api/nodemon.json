@@ -6,5 +6,5 @@
     "ignore": [
         "src/**/*.spec.ts"
     ],
-    "exec": "npx ts-node ./src/index.ts"
+    "exec": "WHERE ts-node >nul 2>&1 && ( ts-node ./src/index.ts ) || ( npx ts-node ./src/index.ts )"
 }

@@ -1,61 +1,107 @@
-import React, { Fragment, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import FormUploadFilms from './components/FormUploadFilms'
+import Alert from './components/Alert'
+import {AlertMessageType, IAlertMessage} from './utils/helpers'
 import './App.css'
 
 function App() {
 
+  const API_BASE_URL = 'http://localhost:5000/films'
+  const API_URL_UPLOAD = API_BASE_URL + '/upload'
+  const TIMEOUT_ALERT_MESSAGE = 3000
+
   interface IFilm {
-    title: string
-    genre: string
-    year: number
+    _id: string
+    titulo: string
+    genero: string
+    'año': number
     director: string
-    actors: string[]
+    actores: string[]
   }
 
-  const [films, setFilms] = useState<IFilm[]>([
-    { title: 'Titanic', genre: 'Drama', year: 1990, director: 'Peter', actors: ['Sophie'] },
-    { title: 'Forrest Gump', genre: 'Comedy', year: 1987, director: 'Alfred', actors: ['Rodrigo', 'Noah'] }
-  ])
+  const [films, setFilms] = useState<IFilm[]>([])
+  // const [filmsUpdated, setFilmsUpdated] = useState<boolean>(false)
+  const [alertMessage, setAlertMessage] = useState<IAlertMessage>({type: undefined, message: undefined})
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    uploadFilms()
-  }
+  useEffect(() => {
+    console.log('times')
+    fetchFilms()
+  }, [])
+
+  useEffect(() => {
+    console.log('changed', alertMessage)
+  }, [alertMessage])
+
+  // function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    // e.preventDefault()
+    // if (fileInput.current && fileInput.current.files && fileInput.current.files.length > 0) {
+    //   uploadFilms(fileInput.current.files[0].name)
+    // } else {
+    //   console.log(fileInput.current)
+    // }
+  // }
 
   async function fetchFilms() {
-    const films = await axios.get(`https://jsonplaceholder.typicode.com/users`)
-    console.log(typeof films)
+    // if (!filmsUpdated) {
+    const response = await axios.get(API_BASE_URL)
+    let films: IFilm[]
+    try {
+      films = response.data.films as IFilm[]
+    } catch (err) {
+      films = []
+    }
+    console.log('films', films)
+    setFilms(films)
+      // setFilmsUpdated(true)
+    // }
   }
 
-  async function uploadFilms() {
-    
-  }
-
-  function updateFilms(data: IFilm[]) {
-    
+  async function uploadFilms(file: File) {
+    console.log('f', file)
+    try {
+      const formData = new FormData()
+      formData.append('uploadFilms', file)
+      const response = await axios.post(API_URL_UPLOAD, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      console.log('r', response)
+      fetchFilms()
+    } catch (err: any) {
+      let message = 'There was a problem trying to upload the file'
+      if (err.response && err.response.data) {
+        message = err.response.data
+      }
+      console.log('setting alert message')
+      // setAlertMessage({
+      //   type: AlertMessageType.Error,
+      //   message
+      // })
+      alertMessage.type = AlertMessageType.Error
+      alertMessage.message = message
+      console.log(alertMessage?.message)
+      // setTimeout(() => {
+      //   setAlertMessage(undefined)
+      // }, TIMEOUT_ALERT_MESSAGE)
+    }
   }
 
   return (
     <div className="bg-dark text-white">
-      <div className="card bg-dark">
-        <div className="card-body">
-          <form onSubmit={ handleSubmit }>
-            <h2 className='text-center'>Films uploader</h2>
-            <p>Ingrese un archivo .csv con las películas que desee!</p>
-            <p>Las columnas deben ser: Título, Género, Año, Director y Actores (separador: ";").</p>
-            <input type="file" name="filmsFile" id="filmsFile" className="form-control" />
-            <button className="btn btn-success w-100 mt-2">Enviar</button>
-          </form>
-        </div>
-      </div>
+      <Alert details={{type: AlertMessageType.Error, message: 'Hola'}} />
+      <FormUploadFilms cb={uploadFilms} />
       <div className="container py-4 px-0">
         <h2 className='subtitle'>Películas</h2>
         <div className="container px-0 d-flex">
-          { films.map((film: IFilm) => (
-            <div className='card card-body bg-secondary text-dark'>
-              <h3 key={ film.title }>{ film.title }</h3>
-            </div>
-          )) }
+          {(films && films.length > 0) ?
+            (films.map((film: IFilm) => (
+              <div className='card card-body bg-secondary text-dark'>
+                <h3 key={film._id}>{film.titulo}</h3>
+              </div>
+            ))) : null
+          }
         </div>
       </div>
     </div>
