@@ -1,7 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
+import {AlertMessageType, IAlertMessage} from '../utils/helpers'
 
 interface IFormUploadFilmsComponent {
     cb: (file: File) => Promise<void>
+}
+
+const NOT_FILE_TO_UPLOAD = 'You must choose a file before submitting'
+
+function SetAlert(alert: IAlertMessage) {
+    const [alertMessage, setAlertMessage] = useState<IAlertMessage>({type: AlertMessageType.None, message: '', display: false})
+    setAlertMessage(() => {
+        return alert
+    })
 }
 
 class FormUploadFilms extends React.Component<IFormUploadFilmsComponent> {
@@ -10,7 +20,6 @@ class FormUploadFilms extends React.Component<IFormUploadFilmsComponent> {
 
     constructor(props: any) {
         super(props)
-        console.log(props)
         this.handleSubmit = this.handleSubmit.bind(this)
         this.fileInput = React.createRef<any>()
         this.cb = props.cb
@@ -19,8 +28,13 @@ class FormUploadFilms extends React.Component<IFormUploadFilmsComponent> {
     async handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
         if (this.fileInput.current.files.length > 0) {
-            console.log(typeof this.fileInput.current.files[0])
             await this.cb(this.fileInput.current.files[0])
+        } else {
+            SetAlert({
+                type: AlertMessageType.Error,
+                message: NOT_FILE_TO_UPLOAD,
+                display: true
+            })
         }
     }
 

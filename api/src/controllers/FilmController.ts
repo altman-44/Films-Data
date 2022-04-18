@@ -1,5 +1,5 @@
-import { AssertionError } from 'assert'
 import { Request, Response } from 'express'
+import { MongooseError } from 'mongoose'
 import { readCSV } from '../lib/helpers/csv-parse'
 import Film, { IFilm } from '../models/Film'
 
@@ -10,6 +10,7 @@ const FILMS_UPLOADED_SUCCESSFULLY = 'Film data uploaded successfully!'
 const UNABLE_TO_UPLOAD_FILMS = "Film data couldn't be uploaded! Please, check if the format is correct."
 const DELETED_ALL_FILMS_SUCCESSFULLY = 'All film data was deleted'
 const UNABLE_TO_DELETE_ALL_FILMS = "Couldn't delete the film data"
+const DATABASE_ERROR = 'There was a problem uploading the data to the database'
 
 class FilmController {
     
@@ -25,13 +26,17 @@ class FilmController {
             readCSV(req.files.uploadFilms.path, async (err?: any, data?: any[]) => {
                 if (!err) {
                     if (data && data.length > 0) {
-                        Film.collection.insertMany(data, {ordered: false}, (err, docs) => {
+                        Film.collection.insertMany(data, {ordered: false}, (err?: MongooseError, docs?: any) => {
                             if (!err) {
                                 console.log('docs', docs)
                                 res.status(200)
                                 res.send(FILMS_UPLOADED_SUCCESSFULLY)
                             } else {
-                                res.status(400).send(UNABLE_TO_UPLOAD_FILMS)
+                                if (err.name == 'MongooseError') {
+                                    res.status(500).send(DATABASE_ERROR)
+                                } else {
+                                    res.status(400).send(UNABLE_TO_UPLOAD_FILMS)
+                                }
                             }
                         })
                     } else {

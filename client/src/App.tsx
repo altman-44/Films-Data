@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useReducer } from 'react'
 import axios from 'axios'
 import FormUploadFilms from './components/FormUploadFilms'
 import Alert from './components/Alert'
@@ -9,7 +9,6 @@ function App() {
 
   const API_BASE_URL = 'http://localhost:5000/films'
   const API_URL_UPLOAD = API_BASE_URL + '/upload'
-  const TIMEOUT_ALERT_MESSAGE = 3000
 
   interface IFilm {
     _id: string
@@ -22,7 +21,7 @@ function App() {
 
   const [films, setFilms] = useState<IFilm[]>([])
   // const [filmsUpdated, setFilmsUpdated] = useState<boolean>(false)
-  const [alertMessage, setAlertMessage] = useState<IAlertMessage>({type: undefined, message: undefined})
+  const [alertMessage, setAlertMessage] = useState<IAlertMessage>({type: AlertMessageType.None, message: '', display: false})
 
   useEffect(() => {
     console.log('times')
@@ -31,6 +30,7 @@ function App() {
 
   useEffect(() => {
     console.log('changed', alertMessage)
+    alertMessage.display = !alertMessage.display
   }, [alertMessage])
 
   // function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -43,7 +43,6 @@ function App() {
   // }
 
   async function fetchFilms() {
-    // if (!filmsUpdated) {
     const response = await axios.get(API_BASE_URL)
     let films: IFilm[]
     try {
@@ -53,8 +52,6 @@ function App() {
     }
     console.log('films', films)
     setFilms(films)
-      // setFilmsUpdated(true)
-    // }
   }
 
   async function uploadFilms(file: File) {
@@ -74,23 +71,19 @@ function App() {
       if (err.response && err.response.data) {
         message = err.response.data
       }
-      console.log('setting alert message')
-      // setAlertMessage({
-      //   type: AlertMessageType.Error,
-      //   message
-      // })
-      alertMessage.type = AlertMessageType.Error
-      alertMessage.message = message
-      console.log(alertMessage?.message)
-      // setTimeout(() => {
-      //   setAlertMessage(undefined)
-      // }, TIMEOUT_ALERT_MESSAGE)
+      setAlertMessage(() => {
+        return {
+          type: AlertMessageType.Error,
+          message,
+          display: true
+        };
+      })
     }
   }
 
   return (
     <div className="bg-dark text-white">
-      <Alert details={{type: AlertMessageType.Error, message: 'Hola'}} />
+      <Alert details={alertMessage} />
       <FormUploadFilms cb={uploadFilms} />
       <div className="container py-4 px-0">
         <h2 className='subtitle'>Películas</h2>
@@ -98,7 +91,9 @@ function App() {
           {(films && films.length > 0) ?
             (films.map((film: IFilm) => (
               <div className='card card-body bg-secondary text-dark'>
-                <h3 key={film._id}>{film.titulo}</h3>
+                <h3 key={film._id}>{film.titulo} ({film['año']})</h3>
+                <p>Director: { film.director }</p>
+                <p>Actores: { film.actores }</p>
               </div>
             ))) : null
           }

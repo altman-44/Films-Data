@@ -6,22 +6,14 @@ interface IAlertComponent {
 }
 
 class Alert extends React.Component<IAlertComponent> {
-    details?: IAlertComponent['details']
-    display: boolean
 
     constructor(props: any) {
         super(props)
-        if (props.details) {
-            this.details = props.details
-            this.display = true
-        } else {
-            this.display = false
-        }
     }
 
     getClassNameByType(): string {
         let className = 'danger'
-        switch (this.details?.type) {
+        switch (this.props.details?.type) {
             case AlertMessageType.Success:
                 className = 'success'
                 break
@@ -34,10 +26,12 @@ class Alert extends React.Component<IAlertComponent> {
 
     render() {
         return (
-            (this.details?.type && this.details.message) ? (
-                <div className={'d-flex justify-content-between alert alert-dismissible alert-' + this.getClassNameByType()}>
-                    {this.details?.message}
+            (this.props.details?.display) ? (
+                <div>
+                    <div className={'d-flex justify-content-between alert alert-dismissible alert-' + this.getClassNameByType()}>
+                    {this.props.details?.message}
                     <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                </div>
                 </div>
             ) : null
         )
