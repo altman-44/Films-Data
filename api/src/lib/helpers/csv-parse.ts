@@ -8,7 +8,7 @@ const ERR_VERIFYING_COLUMN_NAMES = 'There was a problem verifying the column nam
 
 function readCSV(path: string, cb: cbReadCSV, columnNames?: string[]) {
     const parser = parse({columns: true, delimiter: ';'}, (err?: CsvError | any, records?: any[]) => {
-        console.log('records', records)
+        console.log('records', records?.length)
         if (err) {
             console.log('err.message: ', err.message)
         } else if (records && records.length > 0) {

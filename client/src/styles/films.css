@@ -1,0 +1,121 @@
+div.films-box-container {
+    padding: 2rem;
+}
+
+div.films-container {
+    display: flex;
+    flex-wrap: wrap;
+    text-justify: center;
+    -ms-text-justify: space-between;
+    justify-content: space-between;
+    padding: 1rem 0 1rem 0;
+    max-height: 80vh;
+    overflow-y: scroll;
+    gap: .5rem;
+}
+
+div.films-container .card {
+    width: 100%;
+    min-height: 5rem;
+}
+
+div.films-container .card p {
+    margin-bottom: .5rem;
+}
+div.films-container .card :last-child {
+    margin-bottom: 0;
+}
+
+.film-card-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.films-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.films-header div {
+    /* height: 2rem; */
+    width: 100%;
+}
+
+.films-actions button, .films-options .input-group, .films-options button, .films-options select {
+    height: 2rem;
+}
+.films-options button {
+    padding: .2rem 1rem;
+}
+
+.films-options .input-group {
+    flex-wrap: nowrap;
+}
+
+.films-options .input-group .rows-per-page-select {
+    height: 100%;
+}
+
+.row-per-page-text {
+    text-align: left;
+}
+
+div.films-header div.films-pages {
+    margin: 1rem 0;
+}
+div.films-header div.films-pages .input-group {
+    display: flex;
+    justify-content: center;
+}
+.films-pages .input-group-prepend, .films-pages .input-group-append {
+    width: auto;
+}
+.current-page-label {
+    margin-right: 1rem;
+}
+.page-input {
+    width: 3rem;
+    text-align: center;
+}
+
+div.films-container.films-container-empty {
+    display: block;
+    text-align: center;
+    overflow-y: visible;
+    font-size: 1.5rem;
+    padding: 2rem;
+    border: 1px solid white;
+}
+
+@media only screen and (min-width: 576px) {
+    div.films-box-container {
+        padding: 2rem;
+        gap: 1rem;
+    }
+    
+    div.films-container {
+        padding: 0;
+    }
+
+    div.films-container .card {
+        min-height: 5rem;
+        padding: .8rem;
+    }
+
+    .films-header div {
+        width: auto;
+    }
+
+    .row-per-page-text {
+        text-align: right;
+    }
+
+    div.films-header div.films-pages {
+        margin: 0;
+    }
+    .current-page-label {
+        margin-right: 0;
+        width: 100%;
+    }
+}

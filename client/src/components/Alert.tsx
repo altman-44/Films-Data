@@ -3,6 +3,7 @@ import { IAlertMessage, AlertMessageType } from '../utils/helpers'
 
 interface IAlertComponent {
     details?: IAlertMessage
+    setAlertMessage: React.Dispatch<React.SetStateAction<IAlertMessage>>
 }
 
 class Alert extends React.Component<IAlertComponent> {
@@ -24,14 +25,20 @@ class Alert extends React.Component<IAlertComponent> {
         return className
     }
 
+    hideAlert = (): void => {
+        this.props.setAlertMessage(() => ({
+            type: AlertMessageType.None,
+            message: '',
+            display: false
+        }))
+    }
+
     render() {
         return (
             (this.props.details?.display) ? (
-                <div>
-                    <div className={'d-flex justify-content-between alert alert-dismissible alert-' + this.getClassNameByType()}>
-                    {this.props.details?.message}
-                    <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
-                </div>
+                <div id='alert-box' className={ 'd-flex justify-content-between align-items-center alert alert-' + this.getClassNameByType() }>
+                    { this.props.details?.message }
+                    <button className="close btn-close-alert" onClick={ this.hideAlert }>&times;</button>
                 </div>
             ) : null
         )

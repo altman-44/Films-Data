@@ -9,6 +9,7 @@ const UNABLE_TO_READ_FILE = "The file was uploaded but we couldn't read it! Plea
 const FILMS_UPLOADED_SUCCESSFULLY = 'Film data uploaded successfully!'
 const UNABLE_TO_UPLOAD_FILMS = "Film data couldn't be uploaded! Please, check if the format is correct."
 const DELETED_ALL_FILMS_SUCCESSFULLY = 'All film data was deleted'
+const UNABLE_TO_DELETE_ALL_FILMS_BECAUSE_NO_FILMS_IN_DATABASE = "Couldn't delete any film because there wasn't any"
 const UNABLE_TO_DELETE_ALL_FILMS = "Couldn't delete the film data"
 const DATABASE_ERROR = 'There was a problem uploading the data to the database'
 
@@ -32,6 +33,7 @@ class FilmController {
                                 res.status(200)
                                 res.send(FILMS_UPLOADED_SUCCESSFULLY)
                             } else {
+                                console.log(err.message)
                                 if (err.name == 'MongooseError') {
                                     res.status(500).send(DATABASE_ERROR)
                                 } else {
@@ -56,11 +58,16 @@ class FilmController {
     }
 
     public deleteAll (req: Request, res: Response) {
-        Film.deleteMany({}, err => {
+        Film.deleteMany({}, (err: any, response: any) => {
+            console.log('respuesta', response)
             if (err) {
-                res.send(UNABLE_TO_DELETE_ALL_FILMS)
+                res.status(500).send(UNABLE_TO_DELETE_ALL_FILMS)
             } else {
-                res.send(DELETED_ALL_FILMS_SUCCESSFULLY)
+                if (response.deletedCount > 0) {
+                    res.status(200).send(DELETED_ALL_FILMS_SUCCESSFULLY + `. ${response.deletedCount} films were deleted`)
+                } else {
+                    res.status(200).send(UNABLE_TO_DELETE_ALL_FILMS_BECAUSE_NO_FILMS_IN_DATABASE)
+                }
             }
         })
     }

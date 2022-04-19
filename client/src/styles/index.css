@@ -24,3 +24,31 @@ code {
 .bg-secondary h3 {
   color: var(--color-dark);
 }
+
+input[type="file"] {
+  line-height: 14px;
+}
+
+button.btn {
+  border: 1px solid transparent;
+  height: 100%;
+  letter-spacing: .11rem;
+}
+button.btn:focus {
+  box-shadow: none !important;
+}
+button.btn:hover {
+  background-color: transparent; 
+  color: #ced4da;
+  border: 1px solid #ced4da;
+}
+
+.input-group button.btn {
+  padding: 0 1.25rem;
+}
+
+.btn-close-alert {
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+}
