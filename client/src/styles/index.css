@@ -52,3 +52,16 @@ button.btn:hover {
   border: none;
   font-size: 20px;
 }
+
+.icon-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: none;
+  background-color: white;
+  color: black;
+  transition: .5s ease;
+}
+.icon-btn:hover {
+  transform: scale(1.1);
+}

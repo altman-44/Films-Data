@@ -1,38 +1,17 @@
 import fs from 'fs'
-import assert, { AssertionError } from 'assert'
 import { parse, CsvError } from 'csv-parse'
 
 interface cbReadCSV { (err?: any, records?: any[]) : void }
+interface checkColumnNames {(columnNames: string[]): WebAssembly.RuntimeError | void}
 
-const ERR_VERIFYING_COLUMN_NAMES = 'There was a problem verifying the column names'
-
-function readCSV(path: string, cb: cbReadCSV, columnNames?: string[]) {
+function readCSV(path: string, cb: cbReadCSV, checkColumnNames?: checkColumnNames) {
     const parser = parse({columns: true, delimiter: ';'}, (err?: CsvError | any, records?: any[]) => {
-        console.log('records', records?.length)
-        if (err) {
-            console.log('err.message: ', err.message)
-        } else if (records && records.length > 0) {
-            if (columnNames) err = verifyColumnNames(records[0], columnNames)
+        if (!err && records && records.length > 0) {
+            if (checkColumnNames) err = checkColumnNames(Object.keys(records[0]))
         }
-        console.log('error', err)
         cb(err, records)
     })
     fs.createReadStream(path).pipe(parser)
-}
-
-function verifyColumnNames(firstRecord: any, columnNames: string[]) : WebAssembly.RuntimeError | void {
-    let err = undefined
-    try {
-        assert.deepStrictEqual(Object.keys(firstRecord), columnNames)
-    } catch (wrongColumnNamesErr: unknown) {
-        err = new WebAssembly.RuntimeError()
-        if (wrongColumnNamesErr instanceof AssertionError) {
-            err.message = `The first row must be the column names of the dataset. These are: ${columnNames}` 
-        } else {
-            err.message = ERR_VERIFYING_COLUMN_NAMES
-        }
-    }
-    return err
 }
 
 export {

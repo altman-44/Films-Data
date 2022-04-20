@@ -1,11 +1,9 @@
 import React from 'react'
 import axios from 'axios'
-import { AlertMessageType, IAlertMessage, API_BASE_URL, IFilm } from '../utils/helpers'
-// import { fetchFilms } from '../utils/globalFunctions'
-import { TIMEOUT_REMOVE_SUCCESS_ALERT } from '../utils/helpers'
+import { AlertMessageType, IAlertMessage, IFilm } from '../utils/helpers'
+import { API_BASE_URL } from '../utils/constants'
 
 interface IFormUploadFilmsComponent {
-    // cb: (file: File) => Promise<void>
     setFilms: React.Dispatch<React.SetStateAction<IFilm[]>>
     setAlertMessage: React.Dispatch<React.SetStateAction<IAlertMessage>>
     fetchFilms: () => void
@@ -16,11 +14,9 @@ const NOT_FILE_TO_UPLOAD = 'You must choose a file before submitting'
 class FormUploadFilms extends React.Component<IFormUploadFilmsComponent> {
     apiUploadUrl: string
     fileInput: React.RefObject<any>
-    // cb: IFormUploadFilmsComponent['cb']
 
     constructor(props: any) {
         super(props)
-        // this.handleSubmit = this.handleSubmit.bind(this)
         this.apiUploadUrl = API_BASE_URL + '/upload'
         this.fileInput = React.createRef<any>()
     }
@@ -28,7 +24,6 @@ class FormUploadFilms extends React.Component<IFormUploadFilmsComponent> {
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         if (this.fileInput.current.files.length > 0) {
-            // await this.cb(this.fileInput.current.files[0])
             await this.uploadFilms(this.fileInput.current.files[0])
         } else {
             this.props.setAlertMessage(() => ({
@@ -40,7 +35,6 @@ class FormUploadFilms extends React.Component<IFormUploadFilmsComponent> {
     }
 
     uploadFilms = async (file: File) => {
-        console.log('f', file)
         try {
             const formData = new FormData()
             formData.append('uploadFilms', file)
@@ -76,10 +70,10 @@ class FormUploadFilms extends React.Component<IFormUploadFilmsComponent> {
                 <div className="card-body">
                     <form onSubmit={ this.handleSubmit } >
                         <h2 className='text-center'>Films uploader</h2>
-                        <p>Ingrese un archivo .csv con las películas que desee!</p>
-                        <p>Las columnas deben ser: Título, Género, Año, Director y Actores (separador: ";").</p>
+                        <p>Upload a .csv file with the films you wish!</p>
+                        <p>Columns must be these: Título, Género, Año, Director and Actores (separator: ";").</p>
                         <input type="file" name="filmsFile" ref={ this.fileInput } id="filmsFile" className="form-control" />
-                        <button className="btn btn-success w-100 mt-2">Enviar</button>
+                        <button className="btn btn-success w-100 mt-2">Upload</button>
                     </form>
                 </div>
             </div>
