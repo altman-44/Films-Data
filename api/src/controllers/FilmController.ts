@@ -123,11 +123,11 @@ class FilmController {
     private async validateManyFilms(data: IFilm[]) {
         const dataLength = data.length
         if (dataLength > 0) {
-            const filmTitles: String[] = (await Film.find()).map(film => film.titulo)
+            const filmTitles: String[] = (await Film.find()).map(film => film.titulo.toLowerCase())
             if (filmTitles.length > 0) {
                 let i = 0
                 while(i < dataLength) {
-                    if (filmTitles.includes(data[i].titulo)) {
+                    if (filmTitles.includes(data[i].titulo.toLowerCase())) {
                         throw new Error(DUPLICATE_KEY_TITLE)
                     }
                     i++
