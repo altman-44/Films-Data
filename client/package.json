@@ -25,7 +25,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "serve": "WHERE serve >nul 2>&1 && ( serve -s build ) || ( npx serve -s build )"
   },
   "eslintConfig": {
     "extends": [
