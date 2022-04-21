@@ -20,12 +20,12 @@ const options = {
 };
 // parse data with connect-multiparty. 
 app.use(formData.parse(options));
-app.use(express.static(path.join(__dirname, '../client/build')))
+app.use(express.static(path.join(__dirname, '/../client/build')))
 
 app.use('/films', routes)
 // Si ninguna ruta matchea con las de arriba, va al cliente, al index.html
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname + '../client/build/index.html'))
+    res.sendFile(path.join(__dirname + '/../client/build/index.html'))
 })
 
 app.listen(app.get('PORT'), () => {
