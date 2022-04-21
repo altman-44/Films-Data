@@ -1,21 +1,23 @@
 # Films - API
 
+Es una aplicación
+
 ### Database
-The database management system used for this project is MongoDB.
+El sistema gestor de base de datos usado para este proyecto es MongoDB.
 
-### Run the project in development mode
-### Prerequisites
-- [Install Node.js](https://nodejs.org/es/download/). Version must be greater than or equal to 12.
+### Ejecutar el proyecto
+### Prerequisitos
+- [Instalar Node.js](https://nodejs.org/es/download/). Como mínimo, debe ser la versión 12.
 
-### Instructions
-1) Install the required dependencies running: ```npm i```
-2) Create a .env file and save it in this directory.
+### Instrucciones
+1) Instalar las dependencias requeridas ejecutando en la consola: ```npm i```
+2) Crear un archivo .env y guardarlo en este directorio.
 
-    The keys being used are:
-    - PORT: number of port that is going to be used to run the app when it is run locally. If not specified, "3000" is used.
-    - DATABASE_CONNECTION_URI: it is the connection URI with which the app will connect to the database.
+    Los valores a utilizar son:
+    - PORT: número del puerto que va a ser usado para correr la app localmente. Si no se especifica, se usa el puerto "4000".
+    - DATABASE_CONNECTION_URI: es la URI de conexión con la cual la app va a conectarse a la base de datos.
 
-3) In order to run the app, there are two different ways:
+3) Para ejecutar la app, existen dos maneras:
     
-    - ```npm run build && npm start```: build the app for production environment and run it locally. 
-    - ```npm run dev```: run the app while you are developing (using nodemon to reload the server after saving changes)
+    - ```npm run build && npm start```: construir la aplicación para el entorno de producción y ejecutarla localmente.
+    - ```npm run dev```: ejecutar la app mientras se está desarrollando (usando el paquete 'nodemon' para recargar el servidor al guardar los cambios)

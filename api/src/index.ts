@@ -10,7 +10,7 @@ const buildPath = '../../../client/build'
 const app = express()
 import './database'
 
-app.set('PORT', process.env.PORT || 3000)
+app.set('PORT', process.env.PORT || 4000)
 
 const corsOptions = {
     origin: '*'
