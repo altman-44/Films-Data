@@ -14,7 +14,6 @@ const UNABLE_TO_DELETE_ALL_FILMS_BECAUSE_NO_FILMS_IN_DATABASE = "Couldn't delete
 const UNABLE_TO_DELETE_ALL_FILMS = "Couldn't delete the film data"
 const DATABASE_ERROR = 'There was a problem uploading the data to the database'
 const ERR_VERIFYING_COLUMN_NAMES = 'There was a problem verifying the column names'
-const DUPLICATE_KEY_TITLE = 'Titles can not be duplicate!'
 
 class FilmController {
 
@@ -28,7 +27,7 @@ class FilmController {
     }
 
     public findFilmByTitle = async (req: Request, res: Response) => {
-        const filter = {titulo: {$regex: new RegExp(req.params.filmName, 'i')}}
+        const filter = { titulo: { $regex: new RegExp(req.params.filmName, 'i') } }
         const totalNumberOfFilms = await Film.count(filter)
         const films: IFilm[] = await Film.find(filter, null, this.getLimitAndSkip(req.params))
         res.json({
@@ -43,26 +42,28 @@ class FilmController {
                 if (!err) {
                     if (data && data.length > 0) {
                         try {
-                            if (await this.validateManyFilms(data)) {
-                                Film.collection.insertMany(data, {ordered: false}, (err?: MongooseError, docs?: any) => {
+                            const result = await this.validateManyFilms(data)
+                            data = result.data as IFilm[]
+                            if (data.length > 0) {
+                                Film.collection.insertMany(data, { ordered: false }, (err?: MongooseError, docs?: any) => {
                                     if (!err) {
                                         res.status(200)
-                                        res.send(FILMS_UPLOADED_SUCCESSFULLY)
+                                        res.send(FILMS_UPLOADED_SUCCESSFULLY + '. ' + result.message)
                                     } else {
                                         if (err.name == 'MongooseError') {
                                             res.status(500).send(DATABASE_ERROR)
                                         } else {
-                                            res.status(400).send(UNABLE_TO_UPLOAD_FILMS)
+                                            res.status(400).send(UNABLE_TO_UPLOAD_FILMS + (result.message || ''))
                                         }
                                     }
                                 })
                             } else {
-                                res.status(400).send(DUPLICATE_KEY_TITLE)
+                                res.status(400).send(result.message)
                             }
-                        } catch(err: unknown) {
+                        } catch (err: unknown) {
                             res.status(400).send(UNABLE_TO_UPLOAD_FILMS)
                         }
-                        
+
                     } else {
                         res.status(400).send(EMPTY_FILE)
                     }
@@ -75,11 +76,11 @@ class FilmController {
         }
     }
 
-    public edit (req: Request, res: Response) {
+    public edit(req: Request, res: Response) {
         res.json({})
     }
 
-    public deleteAll (req: Request, res: Response) {
+    public deleteAll(req: Request, res: Response) {
         Film.deleteMany({}, (err: any, response: any) => {
             if (err) {
                 res.status(500).send(UNABLE_TO_DELETE_ALL_FILMS)
@@ -104,7 +105,7 @@ class FilmController {
         } catch (wrongColumnNamesErr: unknown) {
             err = new WebAssembly.RuntimeError()
             if (wrongColumnNamesErr instanceof AssertionError) {
-                err.message = `The first row must be the column names of the dataset. These are: ${neededColumnNames}` 
+                err.message = `The first row must be the column names of the dataset. These are: ${neededColumnNames}`
             } else {
                 err.message = ERR_VERIFYING_COLUMN_NAMES
             }
@@ -122,20 +123,41 @@ class FilmController {
         }
     }
 
-    private async validateManyFilms(data: IFilm[]) {
-        let found = false
-        const dataLength = data.length
-        if (dataLength > 0) {
+    private async validateManyFilms(data: IFilm[]): Promise<any> {
+        let message = ''
+        if (data.length > 0) {
+            const dataFilmTitles = data.map(f => f.titulo)
+            data = data.filter(({titulo}, index) => !dataFilmTitles.includes(titulo, index + 1))
             const filmTitles: String[] = (await Film.find()).map(film => film.titulo.toLowerCase())
             if (filmTitles.length > 0) {
-                let i = 0
-                while(!found && i < dataLength) {
-                    found = filmTitles.includes(data[i].titulo.toLowerCase()) 
-                    i++
+                let duplicateFilmTitles = []
+                let i = data.length - 1
+                const maxDuplicateFilmTitlesToDisplay = 5
+                while (i >= 0) {
+                    const currentFilmTitle = data[i].titulo.toLowerCase()
+                    if (filmTitles.includes(currentFilmTitle)) {
+                        data.splice(i, 1)
+                        if (duplicateFilmTitles.length < maxDuplicateFilmTitlesToDisplay) {
+                            duplicateFilmTitles.push(currentFilmTitle)
+                        }
+                    }
+                    i--
+                }
+                if (duplicateFilmTitles.length > 0) {
+                    if (data.length == 0) {
+                        message = 'All film data that was tried to be uploaded had repeated film titles on the database!'
+                    } else if (duplicateFilmTitles.length <= maxDuplicateFilmTitlesToDisplay) {
+                        message = 'As duplicate film titles are not allowed, the following titles were added just once (despite being repeated in the file): ' + duplicateFilmTitles[duplicateFilmTitles.length - 1]
+                        for (let i = duplicateFilmTitles.length - 2; i >= 0; i--) {
+                            message += `, '${duplicateFilmTitles[i]}'`
+                        }
+                    } else {
+                        message = 'Many film titles were on the database already! Duplicate film titles are not allowed'
+                    }
                 }
             }
         }
-        return !found
+        return {data, message}
     }
 }
 
