@@ -43,22 +43,24 @@ class FilmController {
                 if (!err) {
                     if (data && data.length > 0) {
                         try {
-                            await this.validateManyFilms(data)
-                            Film.collection.insertMany(data, {ordered: false}, (err?: MongooseError, docs?: any) => {
-                                if (!err) {
-                                    res.status(200)
-                                    res.send(FILMS_UPLOADED_SUCCESSFULLY)
-                                } else {
-                                    console.log(err.message)
-                                    if (err.name == 'MongooseError') {
-                                        res.status(500).send(DATABASE_ERROR)
+                            if (await this.validateManyFilms(data)) {
+                                Film.collection.insertMany(data, {ordered: false}, (err?: MongooseError, docs?: any) => {
+                                    if (!err) {
+                                        res.status(200)
+                                        res.send(FILMS_UPLOADED_SUCCESSFULLY)
                                     } else {
-                                        res.status(400).send(UNABLE_TO_UPLOAD_FILMS)
+                                        if (err.name == 'MongooseError') {
+                                            res.status(500).send(DATABASE_ERROR)
+                                        } else {
+                                            res.status(400).send(UNABLE_TO_UPLOAD_FILMS)
+                                        }
                                     }
-                                }
-                            })
+                                })
+                            } else {
+                                res.status(400).send(DUPLICATE_KEY_TITLE)
+                            }
                         } catch(err: unknown) {
-                            res.status(400).send(err instanceof Error ? err.message : UNABLE_TO_UPLOAD_FILMS)
+                            res.status(400).send(UNABLE_TO_UPLOAD_FILMS)
                         }
                         
                     } else {
@@ -121,19 +123,19 @@ class FilmController {
     }
 
     private async validateManyFilms(data: IFilm[]) {
+        let found = false
         const dataLength = data.length
         if (dataLength > 0) {
             const filmTitles: String[] = (await Film.find()).map(film => film.titulo.toLowerCase())
             if (filmTitles.length > 0) {
                 let i = 0
-                while(i < dataLength) {
-                    if (filmTitles.includes(data[i].titulo.toLowerCase())) {
-                        throw new Error(DUPLICATE_KEY_TITLE)
-                    }
+                while(!found && i < dataLength) {
+                    found = filmTitles.includes(data[i].titulo.toLowerCase()) 
                     i++
                 }
             }
         }
+        return !found
     }
 }
 
