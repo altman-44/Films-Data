@@ -6,7 +6,6 @@ import formData from 'express-form-data'
 import routes from './routes/films'
 
 const buildPath = '../../../client/build'
-console.log('DIRNAME: ', __dirname)
 
 const app = express()
 import './database'

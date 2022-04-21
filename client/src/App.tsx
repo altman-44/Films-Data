@@ -7,7 +7,6 @@ import { AlertMessageType, IAlertMessage, IFilm } from './utils/helpers'
 // import { fetchFilms } from './utils/globalFunctions'
 import { API_BASE_URL, DEFAULT_ROWS_PER_PAGE, FILMS_BY_TITLE_NOT_FOUND } from './utils/constants'
 import './styles/App.css'
-import { faUsersRectangle } from '@fortawesome/free-solid-svg-icons'
 
 function App() {
 
@@ -15,63 +14,69 @@ function App() {
   const [films, setFilms] = useState<IFilm[]>([])
   const [alertMessage, setAlertMessage] = useState<IAlertMessage>({ type: AlertMessageType.None, message: '', display: false })
   const [filmsPerPage, setFilmsPerPage] = useState<number>(DEFAULT_ROWS_PER_PAGE)
-  const [currentPage, setCurrentPage] = useState<number>(1)
-  const [limitPagesNumber, setLimitPagesNumber] = useState<number>(1)
+  const [currentPage, setCurrentPage] = useState<number>(0)
+  const [currentPageInput, setCurrentPageInput] = useState<string>('')
+  const [limitPagesNumber, setLimitPagesNumber] = useState<number>(0)
   const [totalNumberOfFilms, setTotalNumberOfFilms] = useState<number>(0)
   const [searchedFilmTitle, setSearchedFilmTitle] = useState<string>('')
   const [searchFilmsByTitleFlag, setSearchFilmsByTitleFlag] = useState<boolean>(false)
-  let currentPageWasValidated = false
+  // let currentPageWasValidated = false
+  let minNumberOfPage = 0
 
   useEffect(() => {
+    console.log('one time')
     fetchFilms()
   }, [])
 
   useEffect(() => {
-    if (currentPage == 0) {
-      setCurrentPage(1)
+    if (films && films.length > 0) {
+      minNumberOfPage = 1
+      setLimitPagesNumber(getLimitPage())
+      if (currentPage == 0) {
+        setCurrentPage(minNumberOfPage)
+      }
     }
   }, [films])
 
   useEffect(() => {
-    if (currentPage != 0) {
-      // Si currentPage = 0, significa que el usuario borró el valor del input
-      // para ingresar un nuevo número de página
-      if (!currentPageWasValidated) {
-        currentPageWasValidated = true
-        setCurrentPageChecker()
-      } else {
-        currentPageWasValidated = false
-      }
-    }
-  }, [currentPage])
+    setCurrentPageChecker(currentPage)
+  }, [filmsPerPage, totalNumberOfFilms])
 
   useEffect(() => {
-    setCurrentPageChecker()
-  }, [filmsPerPage, totalNumberOfFilms])
+    fetchFilms()
+  }, [currentPage, filmsPerPage, totalNumberOfFilms])
 
   useEffect(() => {
     if (searchFilmsByTitleFlag) searchFilmsByTitle(searchedFilmTitle)
     setSearchFilmsByTitleFlag(false)
   }, [searchFilmsByTitleFlag])
 
-  function setCurrentPageChecker() {
-    // Si la página seleccionada no es un número válido, se cambia a uno que lo sea 
-    if (isNaN(currentPage) || currentPage <= 0) {
-      setCurrentPage(1)
-    } else {
-      const limit = getLimitPage()
-      if (currentPage > limit) {
-        setCurrentPage(limit)
-      } else {
-        setCurrentPage(currentPage)
-      }
-      setLimitPagesNumber(limit)
-    }
+  function fetchFilms() {
     if (searchedFilmTitle) {
       searchFilmsByTitle(searchedFilmTitle)
     } else {
-      fetchFilms()
+      fetchAllFilms()
     }
+  }
+
+  function setCurrentPageChecker(value: number) {
+    // Si la página seleccionada no es un número válido, se cambia a uno que lo sea 
+    if (isNaN(value) || value < minNumberOfPage) {
+      updateCurrentPage(minNumberOfPage)
+    } else {
+      const limit = getLimitPage()
+      setLimitPagesNumber(limit)
+      if (value > limit) {
+        updateCurrentPage(limit)
+      } else {
+        updateCurrentPage(value)
+      }
+    }
+  }
+
+  function updateCurrentPage(value: number) {
+    setCurrentPage(value)
+    setCurrentPageInput(value.toString())
   }
 
   function getLimitPage(): number {
@@ -84,9 +89,8 @@ function App() {
     return truncatedResult + 1
   }
 
-  async function fetchFilms() {
+  async function fetchAllFilms() {
     setSearchedFilmTitle('')
-    console.log(`fetching films (page: ${currentPage}) (rows: ${filmsPerPage})`)
     const response = await axios.get(API_BASE_URL + `/${filmsPerPage}/${currentPage}`)
     let filmsAux: IFilm[]
     try {
@@ -120,7 +124,7 @@ function App() {
       setTotalNumberOfFilms(numberOfFilms)
       if (alertMessage) setAlertMessage(() => alertMessage)
     } else {
-      fetchFilms()
+      fetchAllFilms()
     }
   }
 
@@ -147,7 +151,9 @@ function App() {
         filmsPerPage={ filmsPerPage }
         setFilmsPerPage={ setFilmsPerPage }
         currentPage={ currentPage }
-        setCurrentPage={ setCurrentPage }
+        setCurrentPage={ setCurrentPageChecker }
+        currentPageInput={currentPageInput}
+        setCurrentPageInput={setCurrentPageInput}
         limitPagesNumber={ limitPagesNumber }
         films={ films }
         setFilms={ setFilms }
@@ -155,7 +161,7 @@ function App() {
         setSearchedFilmTitle={ setSearchedFilmTitle }
         setSearchFilmsByTitleFlag={ setSearchFilmsByTitleFlag }
         deleteAllFilms={ deleteAllFilms }
-        fetchFilms={ fetchFilms } />
+        fetchAllFilms={ fetchAllFilms } />
     </div>
   )
 }

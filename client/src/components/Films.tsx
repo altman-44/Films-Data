@@ -9,7 +9,9 @@ interface IFilmComponent {
     filmsPerPage: number
     setFilmsPerPage: React.Dispatch<React.SetStateAction<number>>
     currentPage: number
-    setCurrentPage: React.Dispatch<React.SetStateAction<number>>
+    setCurrentPage: (value: number) => void
+    currentPageInput: string
+    setCurrentPageInput: React.Dispatch<React.SetStateAction<string>>
     limitPagesNumber: number
     films: IFilm[]
     setFilms: React.Dispatch<React.SetStateAction<IFilm[]>>
@@ -17,17 +19,17 @@ interface IFilmComponent {
     setSearchedFilmTitle: (value: string) => void
     setSearchFilmsByTitleFlag: (value: boolean) => void
     deleteAllFilms: () => void
-    fetchFilms: () => void
+    fetchAllFilms: () => void
 }
 
 class Films extends React.Component<IFilmComponent> {
     filmsPerPage: number
-    currentPage: number
+    numberPageInput: string
 
     constructor(props: any) {
         super(props)
         this.filmsPerPage = props.filmsPerPage
-        this.currentPage = props.currentPage
+        this.numberPageInput = props.currentPage.toString()
     }
 
     selectRowsPerPage = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -41,26 +43,39 @@ class Films extends React.Component<IFilmComponent> {
         this.props.setFilmsPerPage(this.filmsPerPage)
     }
 
-    currentPageInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        let value = Number(event.target.value)
-        if (isNaN(value) || value < 0) {
-            value = 1
-        } else if (value > this.props.limitPagesNumber) {
-            value = this.props.limitPagesNumber
+    currentPageInputOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        let value = event.target.value
+        if (!this.validateNumberPageInput(event.target.value)) value = this.numberPageInput
+        this.props.setCurrentPageInput(value)
+    }
+
+    currentPageInputOnKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key == 'Enter') {
+            if (this.props.currentPageInput) {
+                this.props.setCurrentPage(Number(this.props.currentPageInput))
+            }
+        } else {
+            if (this.validateNumberPageInput((event.target as HTMLInputElement).value)) {
+                this.numberPageInput = this.props.currentPageInput
+            }
         }
-        this.props.setCurrentPage(value)
     }
 
     nextPage = () => {
-        let value = this.props.currentPage + 1
-        if (value > this.props.limitPagesNumber) value--
-        this.props.setCurrentPage(value)
+        // let value = this.props.currentPage + 1
+        // if (value > this.props.limitPagesNumber) value--
+        this.props.setCurrentPage(this.props.currentPage + 1)
     }
 
     previousPage = () => {
-        let value = this.props.currentPage - 1
-        if (value <= 0) value = 1
-        this.props.setCurrentPage(value)
+        // let value = this.props.currentPage - 1
+        // if (value <= 0) value = 1
+        console.log('previous')
+        this.props.setCurrentPage(this.props.currentPage - 1)
+    }
+
+    validateNumberPageInput = (value: string) => {
+        return !isNaN(Number(value))
     }
 
     render() {
@@ -71,7 +86,7 @@ class Films extends React.Component<IFilmComponent> {
                 <div className='films-header mb-3'>
                     <div className="films-actions">
                         <button onClick={ this.props.deleteAllFilms } className='btn btn-danger py-1 px-3'>Delete all</button>
-                        <button onClick={this.props.fetchFilms} className='icon-btn'>
+                        <button onClick={this.props.fetchAllFilms} className='icon-btn'>
                             <FontAwesomeIcon icon={ faArrowRotateRight } title='Reload all films' />
                         </button>
                     </div>
@@ -97,7 +112,7 @@ class Films extends React.Component<IFilmComponent> {
                                 <div className="input-group-prepend">
                                     <button className="btn btn-outline-secondary" type="button" onClick={ this.previousPage }>{ '<' }</button>
                                 </div>
-                                <input type="text" id="page-input" className="page-input" value={ this.props.currentPage.toString() } onChange={ this.currentPageInputChange } aria-label="Current page" title="Enter a page number to select a page" autoComplete='off' />
+                                <input type="text" id="page-input" className="page-input" value={ this.props.currentPageInput } onChange={ this.currentPageInputOnChange } onKeyUp={ this.currentPageInputOnKeyUp } aria-label="Current page" title="Enter a page number to select a page" autoComplete='off' />
                                 <div className="input-group-append">
                                     <button className="btn btn-outline-secondary" type="button" onClick={ this.nextPage }>{ '>' }</button>
                                 </div>
