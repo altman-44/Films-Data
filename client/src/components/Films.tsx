@@ -51,13 +51,6 @@ class Films extends React.Component<IFilmComponent> {
         this.props.setCurrentPage(value)
     }
 
-    // selectPage = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    //     if (event.key == 'Enter') {
-    //         // this.props.setSelectPageFlag(() => true)
-    //         this.props.setCurrentPage(Number((event.target as HTMLInputElement).value))
-    //     }
-    // }
-
     nextPage = () => {
         let value = this.props.currentPage + 1
         if (value > this.props.limitPagesNumber) value--
