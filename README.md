@@ -1,5 +1,5 @@
 # Films-Data
-Esta aplicación le permite al usuario subir a una base de datos un listado de películas en un archivo .csv a través de una api para luego poder visibilizar dichos datos en una interfaz de usuario en un navegador.
+Esta aplicación le permite al usuario subir a una base de datos un listado de películas en un archivo .csv a través de una api para luego poder visualizar dichos datos en una interfaz de usuario en un navegador.
 
 El proyecto está dividido en dos: API y Cliente.
 
