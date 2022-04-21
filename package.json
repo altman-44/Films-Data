@@ -1,0 +1,21 @@
+{
+  "name": "project",
+  "version": "1.0.0",
+  "description": "Upload and retrieve data of different films.",
+  "main": "index.js",
+  "scripts": {
+    "build:ui": "rm -rf build && cd client && npm run build && cp -r build ../api",
+    "deploy": "git subtree push --prefix api heroku main",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/altman-44/Films-Data.git"
+  },
+  "author": "Nicolás Altman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/altman-44/Films-Data/issues"
+  },
+  "homepage": "https://github.com/altman-44/Films-Data#readme"
+}
