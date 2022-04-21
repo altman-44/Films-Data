@@ -4,7 +4,6 @@ import FormUploadFilms from './components/FormUploadFilms'
 import Alert from './components/Alert'
 import Films from './components/Films'
 import { AlertMessageType, IAlertMessage, IFilm } from './utils/helpers'
-// import { fetchFilms } from './utils/globalFunctions'
 import { API_BASE_URL, DEFAULT_ROWS_PER_PAGE, FILMS_BY_TITLE_NOT_FOUND } from './utils/constants'
 import './styles/App.css'
 
@@ -20,11 +19,9 @@ function App() {
   const [totalNumberOfFilms, setTotalNumberOfFilms] = useState<number>(0)
   const [searchedFilmTitle, setSearchedFilmTitle] = useState<string>('')
   const [searchFilmsByTitleFlag, setSearchFilmsByTitleFlag] = useState<boolean>(false)
-  // let currentPageWasValidated = false
   let minNumberOfPage = 0
 
   useEffect(() => {
-    console.log('one time')
     fetchFilms()
   }, [])
 

@@ -62,15 +62,10 @@ class Films extends React.Component<IFilmComponent> {
     }
 
     nextPage = () => {
-        // let value = this.props.currentPage + 1
-        // if (value > this.props.limitPagesNumber) value--
         this.props.setCurrentPage(this.props.currentPage + 1)
     }
 
     previousPage = () => {
-        // let value = this.props.currentPage - 1
-        // if (value <= 0) value = 1
-        console.log('previous')
         this.props.setCurrentPage(this.props.currentPage - 1)
     }
 
