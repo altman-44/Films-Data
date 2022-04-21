@@ -4,7 +4,7 @@
   "description": "Upload and retrieve data of different films.",
   "main": "index.js",
   "scripts": {
-    "build": "cd api && npm run build",
+    "build": "cd api && npm i && npm run build",
     "start": "cd api && npm start",
     "deploy": "git push heroku main",
     "deploy:full": "git add . && git commit -m deploy && git push && npm run deploy",
