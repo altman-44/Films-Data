@@ -4,11 +4,10 @@
   "description": "Upload and retrieve data of different films.",
   "main": "index.js",
   "scripts": {
-    "build": "cd api && npm i && npm run build",
+    "build:api": "cd api && npm i && npm run build",
+    "build:client": "cd client && npm i && npm run build && cp -r build ../api/build/client/",
     "start": "cd api && npm start",
-    "deploy": "git push heroku main",
-    "deploy:full": "git add . && git commit -m deploy && git push && npm run deploy",
-    "heroku-postbuild": "npm run build && cd client && npm i && npm run build"
+    "heroku-postbuild": "npm run build:api && npm run build:client"
   },
   "repository": {
     "type": "git",
