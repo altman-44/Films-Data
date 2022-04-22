@@ -48,7 +48,7 @@ class FilmController {
                                 Film.collection.insertMany(data, { ordered: false }, (err?: MongooseError, docs?: any) => {
                                     if (!err) {
                                         res.status(200)
-                                        res.send(FILMS_UPLOADED_SUCCESSFULLY + '. ' + result.message)
+                                        res.send(FILMS_UPLOADED_SUCCESSFULLY + (result.message ? '. ' + result.message : ''))
                                     } else {
                                         if (err.name == 'MongooseError') {
                                             res.status(500).send(DATABASE_ERROR)

@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
+import { Routes, Route, BrowserRouter, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import Header from './components/Header'
+import Films from './components/Films'
 import FormUploadFilms from './components/FormUploadFilms'
 import Alert from './components/Alert'
-import Films from './components/Films'
 import { AlertMessageType, IAlertMessage, IFilm } from './utils/helpers'
 import { API_BASE_URL, DEFAULT_ROWS_PER_PAGE, FILMS_BY_TITLE_NOT_FOUND } from './utils/constants'
 import './styles/App.css'
 
 function App() {
+  const navigate = useNavigate()
 
   const API_DELETE_ALL_FILMS_URL = API_BASE_URL + '/all'
   const [films, setFilms] = useState<IFilm[]>([])
@@ -24,6 +27,15 @@ function App() {
   useEffect(() => {
     fetchFilms()
   }, [])
+
+  useEffect(() => {
+    // Al navegar hacia otra pantalla, se deben eliminar las alertas
+    setAlertMessage(() => ({
+      type: AlertMessageType.None,
+      message: '',
+      display: false
+    }))
+  }, [navigate])
 
   useEffect(() => {
     if (films && films.length > 0) {
@@ -44,7 +56,10 @@ function App() {
   }, [currentPage, filmsPerPage, totalNumberOfFilms])
 
   useEffect(() => {
-    if (searchFilmsByTitleFlag) searchFilmsByTitle(searchedFilmTitle)
+    if (searchFilmsByTitleFlag) {
+      removeAlertMessage()
+      searchFilmsByTitle(searchedFilmTitle)
+    }
     setSearchFilmsByTitleFlag(false)
   }, [searchFilmsByTitleFlag])
 
@@ -106,7 +121,6 @@ function App() {
       let filmsAux: IFilm[] = []
       let alertMessage: any = null
       const response = await axios.get(API_BASE_URL + `/${filmTitle}/${filmsPerPage}/${currentPage}`)
-      console.log(response)
       if (response.data.films && response.data.films.length > 0) {
         try {
           filmsAux = response.data.films as IFilm[]
@@ -140,25 +154,41 @@ function App() {
     setAlertMessage(() => alert)
   }
 
+  function removeAlertMessage() {
+    setAlertMessage(() => ({
+      type: AlertMessageType.None,
+      message: '',
+      display: false
+    }))
+  }
+  
   return (
-    <div className="bg-dark text-white">
+    <div className="bg-dark text-white App">
+      <Header></Header>
       <Alert details={ alertMessage } setAlertMessage={ setAlertMessage } />
-      <FormUploadFilms setFilms={ setFilms } setAlertMessage={ setAlertMessage } fetchFilms={ fetchFilms } />
-      <Films
-        filmsPerPage={ filmsPerPage }
-        setFilmsPerPage={ setFilmsPerPage }
-        currentPage={ currentPage }
-        setCurrentPage={ setCurrentPageChecker }
-        currentPageInput={currentPageInput}
-        setCurrentPageInput={setCurrentPageInput}
-        limitPagesNumber={ limitPagesNumber }
-        films={ films }
-        setFilms={ setFilms }
-        searchedFilmTitle={ searchedFilmTitle }
-        setSearchedFilmTitle={ setSearchedFilmTitle }
-        setSearchFilmsByTitleFlag={ setSearchFilmsByTitleFlag }
-        deleteAllFilms={ deleteAllFilms }
-        fetchAllFilms={ fetchAllFilms } />
+      <Routes>
+        <Route path='/' element={
+          <Films
+            filmsPerPage={ filmsPerPage }
+            setFilmsPerPage={ setFilmsPerPage }
+            currentPage={ currentPage }
+            setCurrentPage={ setCurrentPageChecker }
+            currentPageInput={ currentPageInput }
+            setCurrentPageInput={ setCurrentPageInput }
+            limitPagesNumber={ limitPagesNumber }
+            films={ films }
+            setFilms={ setFilms }
+            searchedFilmTitle={ searchedFilmTitle }
+            setSearchedFilmTitle={ setSearchedFilmTitle }
+            setSearchFilmsByTitleFlag={ setSearchFilmsByTitleFlag }
+            deleteAllFilms={ deleteAllFilms }
+            fetchAllFilms={ fetchAllFilms }
+          />
+        }></Route>
+        <Route path='/upload' element={
+          <FormUploadFilms setFilms={ setFilms } setAlertMessage={ setAlertMessage } fetchFilms={ fetchFilms } />
+        }></Route>
+      </Routes>
     </div>
   )
 }

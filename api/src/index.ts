@@ -24,7 +24,7 @@ const options = {
 app.use(formData.parse(options));
 app.use(express.static(path.join(__dirname, buildPath)))
 
-app.use('/films', routes)
+app.use('/api/films', routes)
 // Si ninguna ruta matchea con las de arriba, va al cliente, al index.html
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, buildPath, 'index.html'))

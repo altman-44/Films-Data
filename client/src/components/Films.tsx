@@ -107,7 +107,7 @@ class Films extends React.Component<IFilmComponent> {
                                 <div className="input-group-prepend">
                                     <button className="btn btn-outline-secondary" type="button" onClick={ this.previousPage }>{ '<' }</button>
                                 </div>
-                                <input type="text" id="page-input" className="page-input" value={ this.props.currentPageInput } onChange={ this.currentPageInputOnChange } onKeyUp={ this.currentPageInputOnKeyUp } aria-label="Current page" title="Enter a page number to select a page" autoComplete='off' />
+                                <input type="text" id="page-input" className="page-input" value={ this.props.currentPageInput } onChange={ this.currentPageInputOnChange } onKeyUp={ this.currentPageInputOnKeyUp } aria-label="Current page" title="Enter a page number and press enter to select a page" autoComplete='off' />
                                 <div className="input-group-append">
                                     <button className="btn btn-outline-secondary" type="button" onClick={ this.nextPage }>{ '>' }</button>
                                 </div>
